@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,9 +56,14 @@ public class CardsFragment extends Fragment {
         dialog.show();
 
         viewModel.getTriviaLiveData().observe(this, cards -> {
-            triviaList.addAll(cards);
-            setupRecyclerView();
             dialog.hide();
+            if (cards != null && !cards.isEmpty()) {
+                triviaList.addAll(cards);
+                setupRecyclerView();
+            } else {
+                Toast.makeText(getContext(), "Error fetching the data from Numbers API",
+                        Toast.LENGTH_LONG).show();
+            }
         });
     }
 
