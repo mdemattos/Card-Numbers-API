@@ -1,42 +1,35 @@
 package mattos.matheus.bloomtest.ui.main;
 
-import java.util.ArrayList;
+import android.app.Application;
 
+import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import mattos.matheus.bloomtest.api.NumbersRepository;
+import mattos.matheus.bloomtest.model.Card;
 
-public class MainViewModel extends ViewModel {
+public class MainViewModel extends AndroidViewModel {
 
-    MutableLiveData<ArrayList<String>> stringLiveData;
-    ArrayList<String> stringList;
+    private MutableLiveData<List<Card>> triviaLiveData;
+    private NumbersRepository numbersRepository;
 
-    public MainViewModel() {
-        stringLiveData = new MutableLiveData<>();
-
-        init();
+    public MainViewModel(@NonNull Application application) {
+        super(application);
+        triviaLiveData = new MutableLiveData<>();
+        numbersRepository = new NumbersRepository(application);
     }
 
-    public MutableLiveData<ArrayList<String>> getUserMutableLiveData() {
-        return stringLiveData;
+    public MutableLiveData<List<Card>> getTriviaLiveData() {
+        return triviaLiveData;
     }
 
-    public void init() {
-        populateList();
-        stringLiveData.setValue(stringList);
-    }
+    void fetchData() {
+        numbersRepository = NumbersRepository.getInstance(getApplication());
 
-    public void populateList() {
-
-        stringList = new ArrayList<>();
-        stringList.add("Title");
-        stringList.add("Title");
-        stringList.add("Title");
-        stringList.add("Title");
-        stringList.add("Title");
-        stringList.add("Title");
-        stringList.add("Title");
-        stringList.add("Title");
-        stringList.add("Title");
-        stringList.add("Title");
+        for (int i = 1; i <= 50; i++) {
+            triviaLiveData = numbersRepository.getNumberTrivia(i);
+        }
     }
 }

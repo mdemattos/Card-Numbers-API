@@ -7,17 +7,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import mattos.matheus.bloomtest.R;
+import mattos.matheus.bloomtest.model.Card;
 
 public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
-    private ArrayList<String> cardsDescriptionList;
+    private List<Card> cardsDescriptionList;
 
-    public CardAdapter(Context context, ArrayList<String> cardsDescriptionList) {
+    public CardAdapter(Context context, List<Card>cardsDescriptionList) {
         this.context = context;
         this.cardsDescriptionList = cardsDescriptionList;
     }
@@ -31,16 +33,17 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        String string = cardsDescriptionList.get(position);
-        CardViewHolder viewHolder = (CardViewHolder) holder;
+        String title = cardsDescriptionList.get(position).getTitle();
+        String description = cardsDescriptionList.get(position).getDescription();
 
-        viewHolder.cardTitle.setText(string);
-        viewHolder.cardDescription.setText(string);
+        CardViewHolder viewHolder = (CardViewHolder) holder;
+        viewHolder.cardTitle.setText(title);
+        viewHolder.cardDescription.setText(description);
     }
 
     @Override
     public int getItemCount() {
-        return 10;
+        return cardsDescriptionList.size();
     }
 
     class CardViewHolder extends RecyclerView.ViewHolder {

@@ -14,10 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import mattos.matheus.bloomtest.R;
+import mattos.matheus.bloomtest.model.Card;
 import mattos.matheus.bloomtest.ui.adapter.CardAdapter;
 
 public class MainFragment extends Fragment {
@@ -25,6 +27,7 @@ public class MainFragment extends Fragment {
     MainViewModel viewModel;
     RecyclerView recyclerView;
     CardAdapter cardAdapter;
+    List<Card> triviaList = new ArrayList<>();
 
     public static MainFragment newInstance() {
         return new MainFragment();
@@ -41,18 +44,26 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        // TODO: Use the ViewModel
+        viewModel.fetchData();
         recyclerView = getView().findViewById(R.id.recycler_view_cards);
-        viewModel.getUserMutableLiveData().observe(this, userListUpdateObserver);
+        //viewModel.getTriviaLiveData().observe(this, response -> triviaList.add(response));
+
+        viewModel.getTriviaLiveData().observe(this, new Observer<List<Card>>() {
+            @Override
+            public void onChanged(List<Card> cards) {
+                triviaList.addAll(cards);
+                setupRecyclerView();
+            }
+        });
     }
 
-    Observer<ArrayList<String>> userListUpdateObserver = new Observer<ArrayList<String>>() {
-        @Override
-        public void onChanged(ArrayList<String> userArrayList) {
-            cardAdapter = new CardAdapter(getContext(), userArrayList);
+    private void setupRecyclerView() {
+        if (cardAdapter == null) {
+            cardAdapter = new CardAdapter(getContext(), triviaList);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
             recyclerView.setAdapter(cardAdapter);
+        } else {
+            cardAdapter.notifyDataSetChanged();
         }
-    };
-
+    }
 }
