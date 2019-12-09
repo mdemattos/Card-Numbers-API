@@ -9,9 +9,12 @@ import android.widget.TextView;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import mattos.matheus.bloomtest.R;
 import mattos.matheus.bloomtest.model.Card;
+import mattos.matheus.bloomtest.ui.fragment.YearTriviaFragment;
 
 public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -38,6 +41,10 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         CardViewHolder viewHolder = (CardViewHolder) holder;
         viewHolder.cardTitle.setText(title);
         viewHolder.cardDescription.setText(description);
+
+        viewHolder.cardContainer.setOnClickListener(view ->
+                navigateToYearTriviaActivity(cardsDescriptionList.get(position).getNumber())
+        );
     }
 
     @Override
@@ -45,12 +52,22 @@ public class CardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return cardsDescriptionList.size();
     }
 
+    private void navigateToYearTriviaActivity(int year) {
+        AppCompatActivity activity = (AppCompatActivity) context;
+        activity.getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, YearTriviaFragment.newInstance(year))
+                .commitNow();
+    }
+
+
     class CardViewHolder extends RecyclerView.ViewHolder {
+        ConstraintLayout cardContainer;
         TextView cardTitle;
         TextView cardDescription;
 
         CardViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardContainer = itemView.findViewById(R.id.card_container);
             cardTitle = itemView.findViewById(R.id.card_title);
             cardDescription = itemView.findViewById(R.id.card_description);
         }

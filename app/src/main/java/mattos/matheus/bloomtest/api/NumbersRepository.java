@@ -18,8 +18,7 @@ public class NumbersRepository {
     private static NumbersRepository numbersRepository;
     private NumbersApi numbersApi;
     private CardDao cardDao;
-    List<Card> cardsList;
-    AppDatabase appDatabase;
+    private List<Card> cardsList;
 
     public static NumbersRepository getInstance(Application application) {
         if (numbersRepository == null) {
@@ -28,17 +27,39 @@ public class NumbersRepository {
         return numbersRepository;
     }
 
-    public NumbersRepository(Application application) {
-        appDatabase = AppDatabase.getDatabase(application);
+    private NumbersRepository(Application application) {
+        AppDatabase appDatabase = AppDatabase.getDatabase(application);
         cardDao = appDatabase.cardDao();
         cardsList = new ArrayList<>();
         numbersApi = RetrofitService.createService(NumbersApi.class);
+    }
+
+    public MutableLiveData<String> getYearTrivia(int year) {
+
+        final MutableLiveData<String> yearTriviaData = new MutableLiveData<>();
+
+        numbersApi.getYearTrivia(year).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    yearTriviaData.setValue(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                yearTriviaData.setValue(null);
+            }
+        });
+
+        return yearTriviaData;
     }
 
     public MutableLiveData<List<Card>> getNumberTrivia(int number) {
 
         final MutableLiveData<List<Card>> triviaData = new MutableLiveData<>();
 
+        // Checking local database to not fetch from remote server more than once for each number
         if (cardDao.getAllCards().size() < 50) {
             numbersApi.getNumberTrivia(number).enqueue(new Callback<String>() {
                 @Override

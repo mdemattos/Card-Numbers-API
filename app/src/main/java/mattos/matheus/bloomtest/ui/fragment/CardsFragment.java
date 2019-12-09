@@ -1,8 +1,8 @@
-package mattos.matheus.bloomtest.ui.main;
+package mattos.matheus.bloomtest.ui.fragment;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,16 +21,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import mattos.matheus.bloomtest.R;
 import mattos.matheus.bloomtest.model.Card;
 import mattos.matheus.bloomtest.ui.adapter.CardAdapter;
+import mattos.matheus.bloomtest.viewmodel.MainViewModel;
 
-public class MainFragment extends Fragment {
+public class CardsFragment extends Fragment {
 
-    MainViewModel viewModel;
-    RecyclerView recyclerView;
-    CardAdapter cardAdapter;
-    List<Card> triviaList = new ArrayList<>();
+    private MainViewModel viewModel;
+    private RecyclerView recyclerView;
+    private CardAdapter cardAdapter;
+    private List<Card> triviaList = new ArrayList<>();
 
-    public static MainFragment newInstance() {
-        return new MainFragment();
+    public static CardsFragment newInstance() {
+        return new CardsFragment();
     }
 
     @Nullable
@@ -44,16 +45,19 @@ public class MainFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        viewModel.fetchData();
+        viewModel.fetchNumbersTriviaData();
         recyclerView = getView().findViewById(R.id.recycler_view_cards);
-        //viewModel.getTriviaLiveData().observe(this, response -> triviaList.add(response));
 
-        viewModel.getTriviaLiveData().observe(this, new Observer<List<Card>>() {
-            @Override
-            public void onChanged(List<Card> cards) {
-                triviaList.addAll(cards);
-                setupRecyclerView();
-            }
+        ProgressDialog dialog = new ProgressDialog(getContext());
+        dialog.setMessage("Fetching facts...");
+        dialog.setCancelable(false);
+        dialog.setInverseBackgroundForced(false);
+        dialog.show();
+
+        viewModel.getTriviaLiveData().observe(this, cards -> {
+            triviaList.addAll(cards);
+            setupRecyclerView();
+            dialog.hide();
         });
     }
 

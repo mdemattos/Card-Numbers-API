@@ -8,4 +8,7 @@ public interface NumbersApi {
 
     @GET("{number}")
     Call<String> getNumberTrivia(@Path("number") int number);
+
+    @GET("{year}/year")
+    Call<String> getYearTrivia(@Path("year") int year);
 }
